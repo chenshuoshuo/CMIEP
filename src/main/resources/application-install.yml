@@ -1,0 +1,130 @@
+admin:
+  #授权码
+  code: 6992005
+server:
+  port: 12121
+  servlet:
+    context-path: /cmiep
+  error:
+    include-exception: true
+  compression:
+    enabled: false
+  tomcat:
+    max-connections: 1000
+    max-threads: 100
+    min-spare-threads: 10
+    max-http-post-size: 1000MB
+    max-swallow-size: 1000MB
+  address: 192.168.4.121
+logging:
+  register-shutdown-hook: true
+  file: ./log/cmiep.log
+  level:
+    org.springframework.boot: info
+    org.ehcache.impl.internal.store.heap.OnHeapStore: error
+    org.apache.coyote.http11.Http11InputBuffer: debug
+    org.hibernate.SQL: debug
+    io.swagger.models.parameters.AbstractSerializableParameter: error
+  path: classpath:log4j2.xml
+spring:
+  application:
+    name: cmiep
+  servlet:
+    multipart:
+      max-file-size: 1000MB
+      max-request-size: 1000MB
+      file-size-threshold: 10MB
+  h2:
+    console:
+      enabled: true
+      settings:
+        trace: true
+        web-allow-others: true
+      path: /h2
+  jdbc:
+    template:
+      query-timeout: 20s
+  jpa:
+    hibernate:
+      ddl-auto: none
+      use-new-id-generator-mappings: true
+    generate-ddl: false
+    show-sql: false
+    open-in-view: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.spatial.dialect.postgis.PostgisPG95Dialect
+        temp:
+          use_jdbc_metadata_defaults: false
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+        javax.cache.provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
+        javax.cache.missing_cache_strategy: create
+  datasource:
+    hikari:
+      driver-class-name: org.postgresql.Driver
+      username: postgres
+      password: lqkj007
+      auto-commit: true
+      pool-name: cmiep
+      minimum-idle: 4
+      maximum-pool-size: 8
+      idle-timeout: 60000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      read-only: false
+    url: jdbc:postgresql://192.168.4.241:5432/cmiep
+  mvc:
+    favicon:
+      enabled: true
+  flyway:
+    baseline-on-migrate: true
+    enabled: true
+    validate-on-migrate: true
+    schemas:
+      - cmiep
+  resources:
+    cache:
+      cachecontrol:
+        cache-public: true
+        max-age: 0s
+    chain:
+      enabled: true
+      cache: true
+  cloud:
+    consul:
+      enabled: true
+      host: 192.168.4.241
+      port: 8500
+      discovery:
+        enabled: true
+        tags: version=v2,author=free
+        healthCheckPath: ${server.servlet.context-path}/actuator/health
+        healthCheckInterval: 60s
+        instanceId: ${spring.application.name}-${server.address}:${server.port}
+        ip-address: ${server.address}
+        port: ${server.port}
+        prefer-ip-address: true
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: never
+  main:
+    allow-bean-definition-overriding: true
+cmgis:
+  username: free
+  password: 123456
+  context-path: cmgis-server
+#远程调用配置
+feign:
+  httpclient:
+    enabled: true
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+app:
+  version: @project.version@
